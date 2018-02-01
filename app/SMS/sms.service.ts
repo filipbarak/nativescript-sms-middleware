@@ -1,3 +1,4 @@
+declare var android: any;
 import {Injectable} from '@angular/core';
 import * as TNSPhone from 'nativescript-phone';
 import {HttpClient, HttpHeaders} from '@angular/common/http';
@@ -21,12 +22,15 @@ export class SmsService {
     }
 
     sendSms(numbers, body) {
-        TNSPhone.sms(numbers, body)
-            .then((args) => {
-                console.log(JSON.stringify(args));
-            }, (err) => {
-                console.log('Error: ' + err);
-            })
+        // sms.send(numbers, body)
+        //     .then((args) => {
+        //         sms.send(numbers, body);
+        //     }, (err) => {
+        //         console.log('Error: ' + err);
+        //     })
+
+        let sms = android.telephony.SmsManager.getDefault();
+        sms.sendTextMessage(numbers, null, body, null, null);
     }
 
     createHeaders(token?) {
