@@ -2,12 +2,13 @@ declare var android: any;
 import {Injectable} from '@angular/core';
 import * as TNSPhone from 'nativescript-phone';
 import {HttpClient, HttpHeaders} from '@angular/common/http';
+import * as applicationSettings from 'tns-core-modules/application-settings';
 
 
 @Injectable()
 export class SmsService {
     serverUrl = 'https://young-bayou-10751.herokuapp.com';
-    // serverUrl = 'http://localhost:3000';
+     //serverUrl = 'http://localhost:3000';
     private jwtToken = '';
     headers = new HttpHeaders();
     socket;
@@ -38,6 +39,14 @@ export class SmsService {
         if (token) {
             this.headers.append('x-auth', token);
         }
+    }
+
+    saveKeyToStorage(key) {
+        applicationSettings.setString('auth-code', key)
+    }
+
+    getKeyFromStorage() {
+        return applicationSettings.getString('auth-code');
     }
     
 

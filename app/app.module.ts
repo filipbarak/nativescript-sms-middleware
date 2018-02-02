@@ -10,6 +10,7 @@ import {SmsService} from './SMS/sms.service';
 // Uncomment and add to NgModule imports  if you need to use the HTTP wrapper
  import { NativeScriptHttpModule } from "nativescript-angular/http";
 import {HttpClientModule} from '@angular/common/http';
+import {NativeScriptFormsModule} from 'nativescript-angular';
 
 @NgModule({
     bootstrap: [
@@ -18,7 +19,8 @@ import {HttpClientModule} from '@angular/common/http';
     imports: [
         NativeScriptModule,
         NativeScriptHttpModule,
-        HttpClientModule
+        HttpClientModule,
+        NativeScriptFormsModule
     ],
     declarations: [
         AppComponent

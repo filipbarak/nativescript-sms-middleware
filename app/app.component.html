@@ -1,6 +1,6 @@
 <!-- https://docs.nativescript.org/angular/core-concepts/angular-navigation.html#page-router-outlet -->
 <StackLayout>
-    <TextField hint="Code"></TextField>
-    <Button text="Sign in" class="submit-button" (tap)="logPhone()"></Button>
+    <TextField hint="Code" [(ngModel)]="code"></TextField>
+    <Button text="Sign in" class="submit-button" (tap)="authenticate()"></Button>
 
 </StackLayout>
