@@ -23,3 +23,16 @@ Button, TextField {
     color: white;
     margin-top: 20;
 }
+
+.input:disabled {
+    background-color: #C0C0C0;
+
+}
+
+.submit-button:disabled {
+    background-color: #C0C0C0;
+}
+
+.reset-form-button {
+    background-color: #4c4cff
+}

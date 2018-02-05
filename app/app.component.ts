@@ -1,5 +1,5 @@
 declare var android: any;
-import { Component, OnInit, NgZone } from "@angular/core";
+import {Component, OnInit, NgZone, ViewChild, ElementRef} from "@angular/core";
 import {SmsService} from './SMS/sms.service';
 import * as SocketIO from 'nativescript-socket.io';
 import * as permissions from 'nativescript-permissions';
@@ -11,19 +11,24 @@ import * as permissions from 'nativescript-permissions';
 })
 
 export class AppComponent implements OnInit {
+    @ViewChild("connectButton") connectButton: ElementRef;
+    @ViewChild("codeField") codeField: ElementRef;
+    @ViewChild("newCodeButton") newCodeButton: ElementRef;
+    @ViewChild("contactButton") contactButton: ElementRef;
     socket;
     code;
-    constructor(public smsService: SmsService, private zone: NgZone) {
+
+    constructor(public smsService: SmsService) {
         this.socket = SocketIO.connect(this.smsService.serverUrl);
 
-        permissions.requestPermission([android.Manifest.permission.SEND_SMS, android.Manifest.permission.CALL_PHONE], "Need permission to send SMS")
+        permissions.requestPermission([android.Manifest.permission.SEND_SMS, android.Manifest.permission.READ_CONTACTS], "Need permission to send SMS")
             .then(() => {
                 console.log("got permissions")
             })
             .catch(() => {
                 console.log("No permissions")
             })
-    
+
     }
 
     ngOnInit() {
@@ -43,9 +48,19 @@ export class AppComponent implements OnInit {
     }
 
     authenticate() {
+        let codeField = this.codeField.nativeElement;
+        let connectButton = this.connectButton.nativeElement;
+        let newCodeButton = this.newCodeButton.nativeElement;
+        let contactButton = this.contactButton.nativeElement;
+        codeField.editable = false;
+        connectButton.isEnabled = false;
+        newCodeButton.isEnabled = true;
+        contactButton.isEnabled = true;
+        this.socket.removeAllListeners();
         this.saveKey(this.code);
-        let emitEvent = 'message'+this.code;
-        console.log(emitEvent);
+        let emitEvent = 'message' + this.code;
+        console.log(emitEvent, 'eventEmitter');
+        this.smsService.onSuccessNotification(this.code);
         this.socket.on(emitEvent, (socket, message) => {
             console.dir(socket);
             socket.text[0].numberTo.forEach(number => {
@@ -54,16 +69,34 @@ export class AppComponent implements OnInit {
         })
     }
 
-    logPhone() {
-        this.smsService.logPhone();
-    }
-
     saveKey(key) {
         this.smsService.saveKeyToStorage(key);
     }
 
     getKey() {
-       return this.smsService.getKeyFromStorage();
+        return this.smsService.getKeyFromStorage();
     }
-    
+
+    enableForm() {
+        let codeField = this.codeField.nativeElement;
+        let connectButton = this.connectButton.nativeElement;
+        let newCodeButton = this.newCodeButton.nativeElement;
+        codeField.editable = true;
+        connectButton.isEnabled = true;
+        newCodeButton.isEnabled = false;
+    }
+
+    syncContacts() {
+        let contactButton = this.contactButton.nativeElement;
+        contactButton.isEnabled = false;
+        console.log('Syncing....');
+        this.smsService.getContacts().then(contacts => {
+            console.dir({contacts, code:this.code});
+            this.socket.emit('contacts', {contacts, code: this.code});
+
+        }, (e) => {
+            console.dir('Error in syncing...');
+        })
+    }
+
 }

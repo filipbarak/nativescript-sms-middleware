@@ -1,6 +1,8 @@
 <!-- https://docs.nativescript.org/angular/core-concepts/angular-navigation.html#page-router-outlet -->
 <StackLayout>
-    <TextField hint="Code" [(ngModel)]="code"></TextField>
-    <Button text="Sign in" class="submit-button" (tap)="authenticate()"></Button>
+    <TextField hint="Код" class="input" #codeField [(ngModel)]="code"></TextField>
+    <Button #connectButton text="Поврзи се" class="submit-button" (tap)="authenticate()"></Button>
+    <Button #newCodeButton text="Внесете друг код" isEnabled="false" class="reset-form-button" (tap)="enableForm()"></Button>
+    <Button #contactButton text="Превземете контакти" isEnabled="false" class="reset-form-button" (tap)="syncContacts()"></Button>
 
 </StackLayout>
