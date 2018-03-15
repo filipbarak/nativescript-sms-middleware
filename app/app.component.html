@@ -3,6 +3,5 @@
     <TextField hint="Код" class="input" #codeField [(ngModel)]="code"></TextField>
     <Button #connectButton text="Поврзи се" class="submit-button" (tap)="authenticate()"></Button>
     <Button #newCodeButton text="Внесете друг код" isEnabled="false" class="reset-form-button" (tap)="enableForm()"></Button>
-    <Button #contactButton text="Превземете контакти" isEnabled="false" class="reset-form-button" (tap)="syncContacts()"></Button>
-
+    <Button #contactButton text="Превземете контакти" isEnabled="false" class="reset-form-button" (tap)="openContactConfirmationModal()"></Button>
 </StackLayout>

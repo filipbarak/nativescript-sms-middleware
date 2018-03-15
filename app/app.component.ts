@@ -1,8 +1,10 @@
 declare var android: any;
-import {Component, OnInit, NgZone, ViewChild, ElementRef} from "@angular/core";
+import {Component, OnInit, NgZone, ViewChild, ElementRef, ViewContainerRef} from "@angular/core";
 import {SmsService} from './SMS/sms.service';
 import * as SocketIO from 'nativescript-socket.io';
 import * as permissions from 'nativescript-permissions';
+import {ModalDialogService} from 'nativescript-angular/directives/dialogs';
+import {ContactsModalComponent} from './app.modal';
 
 
 @Component({
@@ -18,7 +20,9 @@ export class AppComponent implements OnInit {
     socket;
     code;
 
-    constructor(public smsService: SmsService) {
+    constructor(public smsService: SmsService,
+                public modalService: ModalDialogService,
+                private vcRef: ViewContainerRef) {
         this.socket = SocketIO.connect(this.smsService.serverUrl);
 
         permissions.requestPermission([android.Manifest.permission.SEND_SMS, android.Manifest.permission.READ_CONTACTS], "Need permission to send SMS")
@@ -62,9 +66,29 @@ export class AppComponent implements OnInit {
         console.log(emitEvent, 'eventEmitter');
         this.smsService.onSuccessNotification(this.code);
         this.socket.on(emitEvent, (socket, message) => {
+            let messageToSend = socket.text[0].content;
             console.dir(socket);
             socket.text[0].numberTo.forEach(number => {
-                this.smsService.sendSms(number, socket.text[0].content)
+                let chunks = [];
+                if (messageToSend.length > 153) {
+                    chunks = messageToSend.match(/.{1,153}/g);
+                    chunks.forEach(chunk => {
+                        setTimeout(() => {
+                            this.smsService.sendSms(number, chunk)
+                        }, 500)
+                    });
+                }
+                else {
+                    this.smsService.sendSms(number, messageToSend)
+                }
+            });
+            this.smsService.broadcastReciever(this.smsService.id, () => {
+                console.log('@@@SENT@@@')
+                this.socket.emit('smsSent', {
+                    isSuccess: true,
+                    code: this.code
+                });
+                this.smsService.unregister(this.smsService.id);
             })
         })
     }
@@ -91,11 +115,24 @@ export class AppComponent implements OnInit {
         contactButton.isEnabled = false;
         console.log('Syncing....');
         this.smsService.getContacts().then(contacts => {
-            console.dir({contacts, code:this.code});
+            console.dir({contacts, code: this.code});
             this.socket.emit('contacts', {contacts, code: this.code});
 
         }, (e) => {
             console.dir('Error in syncing...');
+        })
+    }
+
+    openContactConfirmationModal() {
+        let options = {
+            context: {},
+            fullscreen: false,
+            viewContainerRef: this.vcRef
+        };
+        this.modalService.showModal(ContactsModalComponent, options).then(res => {
+            if (res) {
+                this.syncContacts();
+            }
         })
     }
 

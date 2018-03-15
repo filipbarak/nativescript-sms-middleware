@@ -11,6 +11,8 @@ import {SmsService} from './SMS/sms.service';
  import { NativeScriptHttpModule } from "nativescript-angular/http";
 import {HttpClientModule} from '@angular/common/http';
 import {NativeScriptFormsModule} from 'nativescript-angular';
+import { ModalDialogService } from "nativescript-angular/modal-dialog";
+import {ContactsModalComponent} from './app.modal';
 
 @NgModule({
     bootstrap: [
@@ -23,13 +25,18 @@ import {NativeScriptFormsModule} from 'nativescript-angular';
         NativeScriptFormsModule
     ],
     declarations: [
-        AppComponent
+        AppComponent,
+        ContactsModalComponent
     ],
     providers: [
-        SmsService
+        SmsService,
+        ModalDialogService
     ],
     schemas: [
         NO_ERRORS_SCHEMA
+    ],
+    entryComponents: [
+        ContactsModalComponent
     ]
 })
 /*

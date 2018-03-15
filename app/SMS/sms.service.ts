@@ -4,13 +4,19 @@ import {Injectable} from '@angular/core';
 import * as TNSPhone from 'nativescript-phone';
 import {HttpClient, HttpHeaders} from '@angular/common/http';
 import * as applicationSettings from 'tns-core-modules/application-settings';
-import { TNSFancyAlert, TNSFancyAlertButton } from 'nativescript-fancyalert';
+import {TNSFancyAlert, TNSFancyAlertButton} from 'nativescript-fancyalert';
 import * as contacts from 'nativescript-contacts-lite';
+import * as app from "tns-core-modules/application";
+import * as utils from "utils/utils";
+
 
 @Injectable()
 export class SmsService {
     serverUrl = 'https://young-bayou-10751.herokuapp.com';
-     //serverUrl = 'http://localhost:3000';
+    //serverUrl = 'http://localhost:3000';
+    context = utils.ad.getApplicationContext();
+    id = 'messageSent';
+    pendingIntentSent;
     headers = new HttpHeaders();
     socket;
     contactFields = ['display_name', 'phone'];
@@ -18,12 +24,30 @@ export class SmsService {
 
     constructor() {
         //this.createHeaders();
+        this.pendingIntentSent = this.pendingIntent(this.id);
+
 
     }
 
     sendSms(numbers, body) {
         let sms = android.telephony.SmsManager.getDefault();
-        sms.sendTextMessage(numbers, null, body, null, null);
+        sms.sendTextMessage(numbers, null, body, this.pendingIntentSent, null);
+
+    }
+
+    broadcastReciever(id, cb) {
+        app.android.registerBroadcastReceiver(id, () => {
+            cb();
+        });
+    }
+
+    unregister(id) {
+        app.android.unregisterBroadcastReceiver(id);
+    }
+
+    pendingIntent(id) {
+        let intent = new android.content.Intent(id);
+        return android.app.PendingIntent.getBroadcast(this.context, 0, intent, 0);
     }
 
     //createHeaders(token?) {
@@ -47,6 +71,7 @@ export class SmsService {
     }
 
     getContacts() {
+        this.allContacts = [];
         return new Promise((resolve, reject) => {
             contacts.getContactsWorker(this.contactFields).then(contacts => {
                 contacts.forEach(contact => {
@@ -67,11 +92,9 @@ export class SmsService {
     }
 
     formatPhoneNumber(number) {
-        number = number.replace(/["'()]/g,"").replace(/-/g, "");
+        number = number.replace(/["'()]/g, "").replace(/-/g, "");
         return number.split(' ').join('')
     }
 
-
-    
 
 }
