@@ -68,18 +68,21 @@ export class AppComponent implements OnInit {
         this.socket.on(emitEvent, (socket, message) => {
             let messageToSend = socket.text[0].content;
             console.dir(socket);
-            socket.text[0].numberTo.forEach(number => {
+            socket.text[0].numberTo.forEach((number, i) => {
                 let chunks = [];
                 if (messageToSend.length > 153) {
                     chunks = messageToSend.match(/.{1,153}/g);
-                    chunks.forEach(chunk => {
+                    chunks.forEach((chunk, j) => {
                         setTimeout(() => {
                             this.smsService.sendSms(number, chunk)
-                        }, 500)
+                        }, j * 500)
                     });
                 }
                 else {
-                    this.smsService.sendSms(number, messageToSend)
+                    setTimeout(() => {
+                        this.smsService.sendSms(number, messageToSend)
+                    }, i * 500);
+
                 }
             });
             this.smsService.broadcastReciever(this.smsService.id, () => {
