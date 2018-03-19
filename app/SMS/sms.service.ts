@@ -75,8 +75,8 @@ export class SmsService {
         return new Promise((resolve, reject) => {
             contacts.getContactsWorker(this.contactFields).then(contacts => {
                 contacts.forEach(contact => {
-                    console.log(JSON.stringify(contact, null, 2));
                     const contactNumber = this.formatPhoneNumber(contact['phone'][0]['number']);
+                    console.log(JSON.stringify(contactNumber, null, 2));
                     if (this.isNumberMobile(contactNumber)) {
                         console.log(JSON.stringify(contact, null, 2));
                         this.allContacts.push({
