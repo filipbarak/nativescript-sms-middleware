@@ -75,10 +75,14 @@ export class SmsService {
         return new Promise((resolve, reject) => {
             contacts.getContactsWorker(this.contactFields).then(contacts => {
                 contacts.forEach(contact => {
-                    if (contact['phone'][0]['type'] === "mobile") {
+                    console.log(JSON.stringify(contact, null, 2));
+                    const contactNumber = this.formatPhoneNumber(contact['phone'][0]['number']);
+                    if (this.isNumberMobile(contactNumber)) {
+                        console.log(JSON.stringify(contact, null, 2));
                         this.allContacts.push({
                             name: contact['display_name'],
-                            number: this.formatPhoneNumber(contact['phone'][0]['number'])
+                            number: contactNumber,
+                            hasFirm: ''
                         });
                     }
                 });
@@ -94,6 +98,12 @@ export class SmsService {
     formatPhoneNumber(number) {
         number = number.replace(/["'()]/g, "").replace(/-/g, "");
         return number.split(' ').join('')
+    }
+
+    isNumberMobile(number) {
+        return number.startsWith('+3897')
+            || number.startsWith('3897')
+            || number.startsWith('07')
     }
 
 
