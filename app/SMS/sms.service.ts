@@ -12,8 +12,8 @@ import * as utils from "utils/utils";
 
 @Injectable()
 export class SmsService {
-    serverUrl = 'https://young-bayou-10751.herokuapp.com';
-    //serverUrl = 'http://localhost:3000';
+    // serverUrl = 'https://young-bayou-10751.herokuapp.com';
+    serverUrl = 'http://localhost:3000';
     context = utils.ad.getApplicationContext();
     id = 'messageSent';
     pendingIntentSent;
@@ -66,7 +66,7 @@ export class SmsService {
     }
 
     onSuccessNotification(code) {
-        TNSFancyAlert.showSuccess('Автентицирани', `Успешно автентицирани со кодот ${code}`, 'Затвори');
+        TNSFancyAlert.showSuccess('Автентицирани', code, 'Затвори');
 
     }
 

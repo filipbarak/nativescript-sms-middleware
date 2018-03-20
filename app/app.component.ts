@@ -63,8 +63,14 @@ export class AppComponent implements OnInit {
         this.socket.removeAllListeners();
         this.saveKey(this.code);
         let emitEvent = 'message' + this.code;
+        let connectionEvent = 'initConnection' + this.code;
         console.log(emitEvent, 'eventEmitter');
-        this.smsService.onSuccessNotification(this.code);
+        this.socket.emit('initConnection', {
+           code: this.code,
+        });
+        this.socket.on(connectionEvent, (data) => {
+            this.smsService.onSuccessNotification(data.success);
+        });
         this.socket.on(emitEvent, (socket, message) => {
             let messageToSend = socket.text[0].content;
             console.dir(socket);
