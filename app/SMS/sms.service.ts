@@ -70,15 +70,27 @@ export class SmsService {
 
     }
 
+    saveServerUrlToStorage(server) {
+        applicationSettings.setString('serverUrl', server);
+    }
+
+    getServerUrlFromStorage() {
+        const updatedServer = applicationSettings.getString('serverUrl');
+        console.dir(updatedServer);
+        if (updatedServer) {
+            return this.serverUrl = updatedServer;
+        }
+
+        return this.serverUrl;
+    }
+
     getContacts() {
         this.allContacts = [];
         return new Promise((resolve, reject) => {
             contacts.getContactsWorker(this.contactFields).then(contacts => {
                 contacts.forEach(contact => {
                     const contactNumber = this.formatPhoneNumber(contact['phone'][0]['number']);
-                    console.log(JSON.stringify(contactNumber, null, 2));
                     if (this.isNumberMobile(contactNumber)) {
-                        console.log(JSON.stringify(contact, null, 2));
                         this.allContacts.push({
                             name: contact['display_name'],
                             number: contactNumber,

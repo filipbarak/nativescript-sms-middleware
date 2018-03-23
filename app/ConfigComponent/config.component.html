@@ -1,0 +1,9 @@
+<StackLayout>
+    <TextField hint="Внесете нов сервер" [(ngModel)]="server" class="input"></TextField>
+    <Button  text="Потврди" class="submit-button" isEnabled="{{server ? 'true' : 'false'}}" (tap)="close(server)"></Button>
+    <Button  text="Откажи" class="submit-button" (tap)="close()"></Button>
+
+    <Label text="Сервер: {{currentServer}}" textWrap="true"></Label>
+
+</StackLayout>
+

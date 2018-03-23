@@ -1,5 +1,4 @@
-<!-- https://docs.nativescript.org/angular/core-concepts/angular-navigation.html#page-router-outlet -->
-<StackLayout>
+<StackLayout (longPress)="openSecretConfigModal()">
     <TextField hint="Код" class="input" #codeField [(ngModel)]="code"></TextField>
     <Button #connectButton text="Поврзи се" class="submit-button" (tap)="authenticate()"></Button>
     <Button #newCodeButton text="Внесете друг код" isEnabled="false" class="reset-form-button" (tap)="enableForm()"></Button>

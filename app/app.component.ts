@@ -5,6 +5,8 @@ import * as SocketIO from 'nativescript-socket.io';
 import * as permissions from 'nativescript-permissions';
 import {ModalDialogService} from 'nativescript-angular/directives/dialogs';
 import {ContactsModalComponent} from './app.modal';
+import {ConfigComponent} from "./ConfigComponent/config.component";
+import { GestureTypes, GestureEventData} from 'ui/gestures'
 
 
 @Component({
@@ -23,8 +25,8 @@ export class AppComponent implements OnInit {
     constructor(public smsService: SmsService,
                 public modalService: ModalDialogService,
                 private vcRef: ViewContainerRef) {
-        this.socket = SocketIO.connect(this.smsService.serverUrl);
-
+        this.socket = SocketIO.connect(this.smsService.getServerUrlFromStorage());
+            // this.socket = SocketIO.connect('http://localhost:3000')
         permissions.requestPermission([android.Manifest.permission.SEND_SMS, android.Manifest.permission.READ_CONTACTS], "Need permission to send SMS")
             .then(() => {
                 console.log("got permissions")
@@ -41,17 +43,11 @@ export class AppComponent implements OnInit {
                 this.code = this.getKey();
             }
         }
-        //console.log(this.smsService.serverUrl)
-        //console.dir(this.socket)
-        //this.socket.on('message', (socket, message) => {
-        //    console.dir(socket);
-        //    //call smsService.sendMessage(message.text.content, message.text.numberTo)
-        //    // and we are done!
-        //    //this.smsService.sendSms(socket.text.numberTo, socket.text.content)
-        //})
+
     }
 
     authenticate() {
+        console.dir('The server url is', this.smsService.getServerUrlFromStorage())
         let codeField = this.codeField.nativeElement;
         let connectButton = this.connectButton.nativeElement;
         let newCodeButton = this.newCodeButton.nativeElement;
@@ -110,6 +106,7 @@ export class AppComponent implements OnInit {
         return this.smsService.getKeyFromStorage();
     }
 
+
     enableForm() {
         let codeField = this.codeField.nativeElement;
         let connectButton = this.connectButton.nativeElement;
@@ -141,6 +138,25 @@ export class AppComponent implements OnInit {
         this.modalService.showModal(ContactsModalComponent, options).then(res => {
             if (res) {
                 this.syncContacts();
+            }
+        })
+    }
+
+    openSecretConfigModal() {
+        const secretOptions = {
+            viewContainerRef: this.vcRef,
+            context: {},
+            fullscreen: true,
+        };
+        this.modalService.showModal(ConfigComponent, secretOptions).then(res => {
+            if (res) {
+                console.dir(res);
+                this.socket.removeAllListeners();
+                this.smsService.serverUrl = res;
+                this.smsService.saveServerUrlToStorage(res);
+                this.socket = SocketIO.connect(res);
+            } else {
+                console.log('No res.')
             }
         })
     }
